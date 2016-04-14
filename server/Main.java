@@ -1,12 +1,12 @@
 //server
 
-import com.pi4j.wiringpi.Gpio;      //importing gpio libary
-import com.pi4j.wiringpi.SoftPwm; 
-
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.io.InputStreamReader;
-import java.io.BufferedReader;
+
+import com.pi4j.wiringpi.Gpio;
+import com.pi4j.wiringpi.SoftPwm;
 
 public class Main {
 
@@ -42,7 +42,35 @@ public class Main {
 	  
 	  System.out.println("direction: " + pwmamount);
 	  System.out.println("power: " + power);
-	  
+	  switch(pwmamount){
+		case(0):
+			
+		break;
+		case(1):
+			
+		break;
+		case(2):
+			
+		break;
+		case(3):
+			
+		break;
+		case(4):
+			
+		break;
+		case(5):
+			
+		break;
+		case(6):
+			
+		break;
+		case(7):
+			
+		break;
+		case(8):
+			
+		break;
+	 }
 	  Thread.sleep(25);
         }
         serverSocket.close();
