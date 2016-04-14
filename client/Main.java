@@ -15,10 +15,10 @@ public class Main {
 	      //Verbindung zu Port 13000 auf 192.168.3.1 aufbauen:
 	    	System.out.println("Client: Searching for Socket");
 	    	Socket socket = new Socket ("192.168.3.1", 13000);  //ip address and port of the server 
-	    	while((Integer.parseInt(message)) >= 0){
+	    		PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
+	    	while(message.equals("010")){
 	    		System.out.println("Enter PWM amount:");
 	    		message  = sc.next();
-	    		PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
 	    		//Senden eines Newline sorgt dafür, dass der PrintWriter die Ausgabe "abschickt". Alternative müsste "flush" aufgerufen werden.
                 out.println(message);
 	    	}	    	

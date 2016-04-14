@@ -10,12 +10,12 @@ import com.pi4j.wiringpi.SoftPwm;
 
 public class Main {
 
+  public static int pinnrL = 0;
+  public static int pinnrR = 1;
+
   public static void main(String[] args){
-    int pwmamount = 0;
-    int pinnrL = 0;
-    int pinnrR = 1;
-    int power = 0;
-    String serverResponse = "0000";
+    int pwmamount = 0;    int power = 0;
+    String serverResponse = "000";
 
     Gpio.wiringPiSetup();             //setup the pi for pgio
     SoftPwm.softPwmCreate(pinnrL, 0, 100);     //create pwm  (pinnr, min, max)
@@ -30,48 +30,49 @@ public class Main {
         Socket clientSocket = serverSocket.accept();
         System.out.println("Server: Client connected");
         while(Integer.parseInt(serverResponse.substring(1,2)) != 1){
-          BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));   //wait for an input Stream
-	  serverResponse = in.readLine();        //reads new Response
-          System.out.println(serverResponse);
+            BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));   //wait for an input Stream
+            serverResponse = in.readLine();        //reads new Response
+            System.out.println(serverResponse);
+            
+            pwmamount = Integer.parseInt(serverResponse.substring(0,1));       //server answer to integer 
+            power = Integer.parseInt(serverResponse.substring(2,3));
 
-	  pwmamount = Integer.parseInt(serverResponse.substring(0,1));       //server answer to integer 
-	  power = Integer.parseInt(serverResponse.substring(2,4));
-	 
-          //SoftPwm.softPwmWrite(pinnr, pwmamount);       //set (pinnr, any number between min & max)
-          //System.out.println("PWM set to: " + pwmamount);  
-	  
-	  System.out.println("direction: " + pwmamount);
-	  System.out.println("power: " + power);
-	  switch(pwmamount){
-		case(0):
-			setMotor(0,0,0);
-		break;
-		case(1):
-			setMotor(2,2,power);
-		break;
-		case(2):
-		    setMotor(2,1,power);
-		break;
-		case(3):
-	        setMotor(2,-2,power);
-		break;
-		case(4):
-		    setMotor(-2,-1,power);
-		break;
-		case(5):
-			setMotor(-2,-2,power);
-		break;
-		case(6):
-			setMotor(-1,-2,power);
-		break;
-		case(7):
-			setMotor(-2,2,power);
-		break;
-		case(8):
-			setMotor(1,2,power);
-		break;
-	 }
-	  Thread.sleep(25);
+            //SoftPwm.softPwmWrite(pinnr, pwmamount);       //set (pinnr, any number between min & max)
+            //System.out.println("PWM set to: " + pwmamount);  
+            
+
+            System.out.println("direction: " + pwmamount);
+            System.out.println("power: " + power);
+            switch(pwmamount){
+            case(0):
+                setMotor(0,0,0);
+            break;
+            case(1):
+                setMotor(1,1,power);
+            break;
+            case(2):
+                setMotor(1,0,power);
+            break;
+            case(3):
+                setMotor(1,-1,power);
+            break;
+            case(4):
+                setMotor(-1,0,power);
+            break;
+            case(5):
+                setMotor(-1,-1,power);
+            break;
+            case(6):
+                setMotor(0,-1,power);
+            break;
+            case(7):
+                setMotor(-1,1,power);
+            break;
+            case(8):
+                setMotor(0,1,power);
+            break;
+            }
+            Thread.sleep(25);
         }
         serverSocket.close();
         System.out.println("Server: Socket closed");
@@ -83,15 +84,21 @@ public class Main {
 
   }
   public static void setMotor(int l, int r, int speed){
-    
+      if (l>0){
+          l = l + speed;
+      } else {
+          l = l - speed;
+      }
+      if (r>0){
+          r = r + speed;
+      } else {
+          r = r - speed;
+      }
+      if (l != 0 || r != 0){
+          l = l + 15;
+          r = r + 15;
+      } 
+      SoftPwm.softPwmWrite(pinnrL,l);
+      SoftPwm.softPwmWrite(pinnrR,r);
   }
-
-
-
-
 }
-
-
-
-
-
