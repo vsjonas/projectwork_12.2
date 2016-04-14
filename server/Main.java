@@ -44,31 +44,31 @@ public class Main {
 	  System.out.println("power: " + power);
 	  switch(pwmamount){
 		case(0):
-			
+			setMotor(0,0,0);
 		break;
 		case(1):
-			
+			setMotor(2,2,power);
 		break;
 		case(2):
-			
+		    setMotor(2,1,power);
 		break;
 		case(3):
-			
+	        setMotor(2,-2,power);
 		break;
 		case(4):
-			
+		    setMotor(-2,-1,power);
 		break;
 		case(5):
-			
+			setMotor(-2,-2,power);
 		break;
 		case(6):
-			
+			setMotor(-1,-2,power);
 		break;
 		case(7):
-			
+			setMotor(-2,2,power);
 		break;
 		case(8):
-			
+			setMotor(1,2,power);
 		break;
 	 }
 	  Thread.sleep(25);
@@ -82,6 +82,16 @@ public class Main {
       }
 
   }
+  public static void setMotor(int l, int r, int speed){
+    
+  }
+
+
+
 
 }
+
+
+
+
 
