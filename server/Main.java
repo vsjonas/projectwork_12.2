@@ -94,10 +94,12 @@ public class Main {
       } else {
           r = r - speed;
       }
-      if (l != 0 || r != 0){
+      if (l != 0){
           l = l + 15;
+      }
+      if (r != 0){
           r = r + 15;
-      } 
+      }
       SoftPwm.softPwmWrite(pinnrL,l);
       SoftPwm.softPwmWrite(pinnrR,r);
   }
