@@ -28,9 +28,6 @@ public class Main extends Frame implements ActionListener{
     Panel cp2 = new Panel(new BorderLayout());
     add(cp2);
 
-    Button connect = new Button();
-    connect.setLabel("connect");
-    connect.addActionListener(this);
 
     Panel cp = new Panel(new GridLayout(3,3));
     cp2.add(cp, BorderLayout.CENTER);
