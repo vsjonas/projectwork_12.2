@@ -22,7 +22,12 @@ public class Main extends Frame implements ActionListener{
     // Frame-Init
     super(title);
     addWindowListener(new WindowAdapter() {
-      public void windowClosing(WindowEvent evt) { dispose(); }
+      public void windowClosing(WindowEvent evt) { dispose(); 
+      System.out.println("closed"); 
+      disconnect();
+      System.exit(0);
+      return;
+      }
     });
     int frameWidth = 300; 
     int frameHeight = 300;
@@ -89,19 +94,17 @@ public class Main extends Frame implements ActionListener{
             reconnect();
         }else if(action.equals("close")){               //disconnect
             System.out.println("closing down the socket");
-            send("0100");
-            socket.close();
-            lStatus.setBackground(Color.LIGHT_GRAY);
-            lStatus.setText("Status: not connected");
-            connected = false;
+            disconnect();
         }else if(action.equals("0")){                   //stop
-            send("000");
+            if(connected){
+                send("000");
+            }
         }else{                                          //move
-            int actionInt = Integer.parseInt(action);
-
-            System.out.println(actionInt+"0"+power);
-            send(actionInt+"0"+power);
-
+            if(connected){
+                int actionInt = Integer.parseInt(action);
+                System.out.println(actionInt+"0"+power);
+                send(actionInt+"0"+power);
+            }
         }
     }catch(Exception ex){
         ex.printStackTrace();
@@ -126,6 +129,19 @@ public class Main extends Frame implements ActionListener{
         lStatus.setBackground(Color.RED);
         lStatus.setText("Status: failed");
         connected = false;
+    }
+  }
+  public static void disconnect(){
+    if(connected){
+      try{
+        send("0100");
+        socket.close();
+        lStatus.setBackground(Color.LIGHT_GRAY);
+        lStatus.setText("Status: not connected");
+        connected = false;
+        }catch(Exception ex){
+         ex.printStackTrace();
+        }
     }
   }
   public static void send(String message){
