@@ -57,7 +57,6 @@ public class Main{
                 System.out.println("Server: Client connected");
                 out = new PrintWriter(clientSocket.getOutputStream(), true);
                 connected = true;
-                int j=0;
                 long starttime = System.currentTimeMillis();
                 while(option != 1){
             
@@ -69,9 +68,6 @@ public class Main{
                     option = Integer.parseInt(serverResponse.substring(1,2));
                     power = Integer.parseInt(serverResponse.substring(2,3));
 
-                    //SoftPwm.softPwmWrite(pinnr, pwmamount);       //set (pinnr, any number between min & max)
-                    //System.out.println("PWM set to: " + pwmamount);  
-                    
                     if(option == 3){
                         pingAnswered = true;
                         starttime = System.currentTimeMillis();
@@ -113,7 +109,6 @@ public class Main{
                             break;
                         }
                     }
-                    j++;
                     Thread.sleep(25);
                 }
                 serverSocket.close();
@@ -128,20 +123,20 @@ public class Main{
         }
     }
   public static void setMotor(int l, int r, int speed){
-      if (l>0){
-          l = l + speed;
-      } else {
-          l = l - speed;
-      }
-      if (r>0){
-          r = r + speed;
-      } else {
-          r = r - speed;
-      }
       if (l != 0){
+          if (l>0){
+              l = l + speed;
+          } else {
+              l = l - speed;
+          }
           l = l + 15;
       }
       if (r != 0){
+          if (r>0){
+              r = r + speed;
+          } else {
+              r = r - speed;
+          }          
           r = r + 15;
       }
       SoftPwm.softPwmWrite(pinnrL,l);
