@@ -8,14 +8,21 @@ import java.io.InputStreamReader;
 
 public class Main extends Frame implements ActionListener{
   // start attributes
-  static Button bArr[] = new Button[9];
-  static Label lStatus = new Label();
-  static TextField tIP = new TextField();
+  static Button bArr[] = new Button[9];                 //Buttons for the directions
+  static Button bConnect = new Button();                //Connect button
+  static Button bClose = new Button();                  //Close button
+  static Button bPu = new Button();                     //increase power button
+  static Button bPd = new Button();                     //decrease power button
+  static Label lPower = new Label();                    //show current power label
+  static Label lStatus = new Label();                   //show current status label
+  static TextField tIP = new TextField();               //ip textfield
   static int power = 4;
   static Socket socket;
   static PrintWriter out; 
   static BufferedReader in; 
   static boolean connected = false;
+  static boolean runPing = true;
+  static boolean lastping = false;
   // end attributes
   
   public Main(String title) { 
@@ -25,6 +32,7 @@ public class Main extends Frame implements ActionListener{
       public void windowClosing(WindowEvent evt) { dispose(); 
       System.out.println("closed"); 
       disconnect();
+      runPing = false;
       System.exit(0);
       return;
       }
@@ -44,7 +52,7 @@ public class Main extends Frame implements ActionListener{
     Panel cp = new Panel(new GridLayout(3,3));
     cp2.add(cp, BorderLayout.CENTER);
 
-    for (int i = 0;i < bArr.length ; i++) {
+    for (int i = 0;i < bArr.length ; i++) {                 //create 9 buttons
         bArr[i] = new Button();
     //    bArr[i].setLabel(""+i);
         bArr[i].addActionListener(this);
@@ -60,21 +68,33 @@ public class Main extends Frame implements ActionListener{
     bArr[7].setLabel("5");
     bArr[8].setLabel("4");
 
+    lPower.setText("Power: " + power);
     lStatus.setBackground(Color.LIGHT_GRAY);
-    lStatus.setText("Status: not connected");
+    lStatus.setText("Not connected");
     tIP.setText("192.168.3.1");
 
-    Button bConnect = new Button();
+    bPu.setLabel("+");
+    bPu.addActionListener(this);
+    bPd.setLabel("-");
+    bPd.addActionListener(this);
+    
+
     bConnect.setLabel("connect");
     bConnect.addActionListener(this);
-    Button bClose = new Button();
     bClose.setLabel("close");
     bClose.addActionListener(this);
     
     Panel cp3 = new Panel(new GridLayout(2,2));
     cp2.add(cp3, BorderLayout.NORTH);
-    cp3.add(lStatus);
+
+    Panel cp4 = new Panel(new GridLayout(1,2));
+    cp4.add(bPd);
+    cp4.add(bPu);
+
+    cp3.add(lPower);
+    cp3.add(cp4);
     cp3.add(tIP);
+    cp3.add(lStatus);
     cp3.add(bConnect);
     cp3.add(bClose);
 
@@ -95,6 +115,14 @@ public class Main extends Frame implements ActionListener{
         }else if(action.equals("close")){               //disconnect
             System.out.println("closing down the socket");
             disconnect();
+        }else if(action.equals("-")){                   //decrease power
+            if(power>1){
+                power--;
+            }
+            lPower.setText("Power: "+power);
+        }else if(action.equals("+")){                   //increase power
+            power++;
+            lPower.setText("Power: "+power);
         }else if(action.equals("0")){                   //stop
             if(connected){
                 send("000");
@@ -109,7 +137,7 @@ public class Main extends Frame implements ActionListener{
     }catch(Exception ex){
         ex.printStackTrace();
         lStatus.setBackground(Color.RED);
-        lStatus.setText("Status: failed");
+        lStatus.setText("Failed"); 
         connected = false;
     }
   }
@@ -122,25 +150,33 @@ public class Main extends Frame implements ActionListener{
         in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
         System.out.println("Connected");
         lStatus.setBackground(Color.GREEN);
-        lStatus.setText("Status: connected");
-        connected = true;       
+        lStatus.setText("Connected");
+        connected = true;      
     }catch(Exception ex){
         ex.printStackTrace();
         lStatus.setBackground(Color.RED);
-        lStatus.setText("Status: failed");
+        lStatus.setText("Failed");
         connected = false;
     }
   }
   public static void disconnect(){
     if(connected){
-      try{
-        send("0100");
-        socket.close();
-        lStatus.setBackground(Color.LIGHT_GRAY);
-        lStatus.setText("Status: not connected");
-        connected = false;
+        try{
+            lastping = true;
+            connected = false;
+            while(lastping){                            //waiting for a last ping
+                try{
+                    Thread.sleep(100);
+                }catch(Exception e){
+                    e.printStackTrace();
+                }
+            }
+            send("0100");
+            socket.close();
+            lStatus.setBackground(Color.LIGHT_GRAY);
+            lStatus.setText("Not connected");
         }catch(Exception ex){
-         ex.printStackTrace();
+            ex.printStackTrace();
         }
     }
   }
@@ -149,24 +185,43 @@ public class Main extends Frame implements ActionListener{
   }
 
   public static void main(String[] args) {
-    new Main("Main");        
-    while(true){
-        
-         try{
-            Thread.sleep(1000);
-            if(connected){
-                in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-                String message = in.readLine();
-                if(message.equals("ping")){
-                    send("0300");
-                    System.out.println("ping answered");
+    new Main("Main");       
+    Thread ping = new Thread(new Runnable(){
+        public void run(){
+            //System.out.println("0");
+            while(runPing){
+               // System.out.println("1");
+                if(connected){
+                   //System.out.println("2");
+                    try{
+                        in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+                        String pingMessage = in.readLine();
+                        if(pingMessage.equals("ping")){
+                            out.println("030");
+                            System.out.println("ping answered"); 
+                            lastping = false;
+                        }
+                    }catch(Exception e){
+                        e.printStackTrace();
+                    }
                 }
-            Thread.sleep(1000);
+                try{
+                    Thread.sleep(500);
+                }catch(Exception e){
+                    e.printStackTrace();
+                }
             }
-        }catch(Exception e){
-            e.printStackTrace();
+            try{
+            //out.println("010");
+            //socket.close();
+            }catch(Exception e){
+                e.printStackTrace();
+            }
+            System.out.println("Client: Socket closed");
         }
-    } 
+    });
+    ping.start();
+
   } // end of main
     
     // end methods
