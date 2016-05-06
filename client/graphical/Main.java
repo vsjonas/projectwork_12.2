@@ -21,8 +21,6 @@ public class Main extends Frame implements ActionListener{
   static PrintWriter out; 
   static BufferedReader in; 
   static boolean connected = false;
-  static boolean runPing = true;
-  static boolean lastping = false;
   // end attributes
   
   public Main(String title) { 
@@ -32,7 +30,6 @@ public class Main extends Frame implements ActionListener{
       public void windowClosing(WindowEvent evt) { dispose(); 
       System.out.println("closed"); 
       disconnect();
-      runPing = false;
       System.exit(0);
       return;
       }
@@ -162,19 +159,11 @@ public class Main extends Frame implements ActionListener{
   public static void disconnect(){
     if(connected){
         try{
-            lastping = true;
-            connected = false;
-            while(lastping){                            //waiting for a last ping
-                try{
-                    Thread.sleep(100);
-                }catch(Exception e){
-                    e.printStackTrace();
-                }
-            }
             send("0100");
             socket.close();
             lStatus.setBackground(Color.LIGHT_GRAY);
             lStatus.setText("Not connected");
+            connected = false;
         }catch(Exception ex){
             ex.printStackTrace();
         }
@@ -185,43 +174,7 @@ public class Main extends Frame implements ActionListener{
   }
 
   public static void main(String[] args) {
-    new Main("Main");       
-    Thread ping = new Thread(new Runnable(){
-        public void run(){
-            //System.out.println("0");
-            while(runPing){
-               // System.out.println("1");
-                if(connected){
-                   //System.out.println("2");
-                    try{
-                        in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-                        String pingMessage = in.readLine();
-                        if(pingMessage.equals("ping")){
-                            out.println("030");
-                            System.out.println("ping answered"); 
-                            lastping = false;
-                        }
-                    }catch(Exception e){
-                        e.printStackTrace();
-                    }
-                }
-                try{
-                    Thread.sleep(500);
-                }catch(Exception e){
-                    e.printStackTrace();
-                }
-            }
-            try{
-            //out.println("010");
-            //socket.close();
-            }catch(Exception e){
-                e.printStackTrace();
-            }
-            System.out.println("Client: Socket closed");
-        }
-    });
-    ping.start();
-
+    new Main("Main"); 
   } // end of main
     
     // end methods
