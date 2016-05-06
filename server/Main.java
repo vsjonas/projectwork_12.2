@@ -11,7 +11,8 @@ import com.pi4j.wiringpi.Gpio;
 import com.pi4j.wiringpi.SoftPwm;
 
 public class Main{
-
+    public static int pwmModL = 13;
+    public static int pwmModR = 13;
     public static int pinnrL = 0;
     public static int pinnrR = 1;
     public static int option = 0;
@@ -25,7 +26,8 @@ public class Main{
         
         while(option != 2){
             option = 0;
-            int pwmamount = 0;    int power = 0;
+            int pwmamount = 0;    
+            int power = 0;
             String serverResponse = "000";
             try
               {
@@ -102,7 +104,7 @@ public class Main{
           } else {
               l = l - speed;
           }
-          l = l + 15;
+          l = l + pwmModL;
       }
       if (r != 0){
           if (r>0){
@@ -110,7 +112,7 @@ public class Main{
           } else {
               r = r - speed;
           }          
-          r = r + 15;
+          r = r + pwmModR;
       }
       SoftPwm.softPwmWrite(pinnrL,l);
       SoftPwm.softPwmWrite(pinnrR,r);
