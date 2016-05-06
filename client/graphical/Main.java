@@ -1,8 +1,9 @@
 import java.awt.*;
 import java.awt.event.*;
 import java.net.Socket;
-import java.io.PrintWriter;
+import java.net.InetSocketAddress;
 
+import java.io.PrintWriter;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 
@@ -107,10 +108,8 @@ public class Main extends Frame implements ActionListener{
     System.out.println("-------------" + action);
     try{
         if (action.equals("connect")){                  //connect
-            System.out.println("trying to (re)connect");
             reconnect();
         }else if(action.equals("close")){               //disconnect
-            System.out.println("closing down the socket");
             disconnect();
         }else if(action.equals("-")){                   //decrease power
             if(power>1){
@@ -139,25 +138,29 @@ public class Main extends Frame implements ActionListener{
     }
   }
   public static void reconnect(){
-    try{
-        
-        System.out.println("Client: Searching for Socket");
-        socket = new Socket (tIP.getText(), 13000);  //ip address and port of the server 
-        out = new PrintWriter(socket.getOutputStream(), true);
-        in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-        System.out.println("Connected");
-        lStatus.setBackground(Color.GREEN);
-        lStatus.setText("Connected");
-        connected = true;      
-    }catch(Exception ex){
-        ex.printStackTrace();
-        lStatus.setBackground(Color.RED);
-        lStatus.setText("Failed");
-        connected = false;
+    if(!connected){
+        System.out.println("trying to (re)connect");
+        try{ 
+            System.out.println("Client: Searching for Socket");
+            socket = new Socket();                                                  //creates new socket
+            socket.connect(new InetSocketAddress(tIP.getText(), 13000), 1000);      //connects to a server with a 1000ms timeout
+
+            out = new PrintWriter(socket.getOutputStream(), true);
+            in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            System.out.println("Connected");
+            lStatus.setBackground(Color.GREEN);
+            lStatus.setText("Connected");
+            connected = true;      
+        }catch(Exception ex){
+            ex.printStackTrace();
+            lStatus.setBackground(Color.RED);
+            lStatus.setText("Failed");
+            connected = false;
+        }
     }
   }
   public static void disconnect(){
-    if(connected){
+    if(connected){        System.out.println("closing down the socket");
         try{
             send("0100");
             socket.close();
