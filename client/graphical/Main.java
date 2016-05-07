@@ -4,8 +4,8 @@ import java.net.Socket;
 import java.net.InetSocketAddress;
 
 import java.io.PrintWriter;
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
+//import java.io.BufferedReader;
+//import java.io.InputStreamReader;
 
 public class Main extends Frame implements ActionListener{
   // start attributes
@@ -20,7 +20,7 @@ public class Main extends Frame implements ActionListener{
   static int power = 4;
   static Socket socket;
   static PrintWriter out; 
-  static BufferedReader in; 
+  //static BufferedReader in; 
   static boolean connected = false;
   // end attributes
   
@@ -146,7 +146,7 @@ public class Main extends Frame implements ActionListener{
             socket.connect(new InetSocketAddress(tIP.getText(), 13000), 1000);      //connects to a server with a 1000ms timeout
 
             out = new PrintWriter(socket.getOutputStream(), true);
-            in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            //in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             System.out.println("Connected");
             lStatus.setBackground(Color.GREEN);
             lStatus.setText("Connected");
@@ -160,7 +160,8 @@ public class Main extends Frame implements ActionListener{
     }
   }
   public static void disconnect(){
-    if(connected){        System.out.println("closing down the socket");
+    if(connected){        
+        System.out.println("closing down the socket");
         try{
             send("0100");
             socket.close();
