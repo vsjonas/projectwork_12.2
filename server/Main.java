@@ -38,7 +38,7 @@ public class Main{
                 Socket clientSocket = serverSocket.accept();
                 System.out.println("Server: Client connected");
                 out = new PrintWriter(clientSocket.getOutputStream(), true);
-                while(option != 1){
+                while(option != 1 && option != 2){
                     BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));   //wait for an input Stream
                     serverResponse = in.readLine();        //reads new Response
                     System.out.println(serverResponse);
