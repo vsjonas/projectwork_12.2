@@ -104,6 +104,7 @@ public class Main{
           }
           l = l + pwmModL;
       }
+      r = r * -1;                   //to make the right servo drive in the onther direction (make the car drive forward) and not spin in a circle
       if (r != 0){
           if (r>0){
               r = r + speed;
